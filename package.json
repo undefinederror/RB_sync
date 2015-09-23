@@ -1,0 +1,11 @@
+{
+  "name": "rb_sync",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "author": "el paf",
+  "license": "ISC",
+  "devDependencies": {
+    "grunt": "^0.4.5"
+  }
+}
