@@ -13,7 +13,7 @@ module.exports = function(grunt){
 		var file=grunt.file.readJSON(grunt.config('log.filename'));
 		file.otherProp="dynamic";
 		grunt.file.write(grunt.config('log.filename'),JSON.stringify(file));
-		grunt.log.writeln('DONE');
+		grunt.log.writeln('DONE!');
 	});
 	
 	
