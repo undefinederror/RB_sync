@@ -1,1 +1,0 @@
-{"prop":"val","x":2,"y":true,"otherProp":"dynamic"}

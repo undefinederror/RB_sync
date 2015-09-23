@@ -6,6 +6,8 @@
   "author": "el paf",
   "license": "ISC",
   "devDependencies": {
-    "grunt": "^0.4.5"
+    "grunt": "^0.4.5",
+    "jsftp": "^1.5.2",
+    "lodash": "^3.10.1"
   }
 }
