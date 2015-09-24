@@ -8,6 +8,7 @@
   "devDependencies": {
     "grunt": "^0.4.5",
     "jsftp": "^1.5.2",
-    "lodash": "^3.10.1"
+    "lodash": "^3.10.1",
+    "when": "^3.7.3"
   }
 }

@@ -2,6 +2,7 @@ module.exports = function(grunt){
 	'use strict';
 	
 	var _= require('lodash');
+	var when =  require('when');
 	var JSftp = require('jsftp');
 	
 	grunt.initConfig({
@@ -37,44 +38,45 @@ module.exports = function(grunt){
 	});
 	grunt.registerTask('get','get files from remote',function(){
 		var
-			done = this.async(),
+			//done = this.async(),
 			choice='0',
 			env=grunt.config(this.name)[choice],
 			conf=grunt.config('ftpConf')[env],
 			pass=grunt.file.readJSON(grunt.config('ftpPass'))[conf.auth.authKey]
 		;
 		_.extend(conf.auth,pass);
-		//grunt.log.writeln(JSftp);
 		var ftp= new JSftp(conf.auth);
-		ftp.on('jsftp_debug', function(eventType, data) {
-			//console.log('DEBUG: ', eventType);
-			//console.log(JSON.stringify(data, null, 2));
-		});
-		ftp.auth(ftp.username,ftp.password,function(err,res){
-			grunt.log.writeln('connecting to '+ ftp.host+ '...\r');
-			if(err){
-			grunt.log.writeln(err);
-			done();
-			}else{
-			grunt.log.writeln('connected. Let\'s go on\r');
-			list();
-			
-			
-			}
-		});
+		
+		//ftp.on('jsftp_debug', function(eventType, data) {
+		//	//console.log('DEBUG: ', eventType);
+		//	//console.log(JSON.stringify(data, null, 2));
+		//});
+		function auth(){
+			return when(ftp.auth(ftp.username,ftp.password));
+		}
+		//	//,function(err,res){
+		//	//	grunt.log.writeln('connecting to '+ ftp.host+ '...\r');
+		//	//	if(err){
+		//	//	grunt.log.writeln(err);
+		//	//	done();
+		//	//	}else{
+		//	//	grunt.log.writeln('connected. Let\'s go on\r');
+		//	//	list();
+		//	//}
+		//}
+		
 		function list(){
-			ftp.ls("/ray-ban.com/rbdev/Views/StoreLocator", function(err, res) {
-				res.forEach(function(file) {
-					console.log(file.name);
-				});
-				console.log(res.length + ' files');
-				done();
-			});
+			return when(ftp.ls("/ray-ban.com/rbdev/Views/StoreLocator"));
 		}
 		
 		
 		//grunt.log.writeln(JSON.stringify(conf));
-		
+		auth()
+		.then(list)
+		.then(function(err,res){
+			console.log('err ' + err);
+			console.log('res ' + res);
+		});
 	});
 	
 	
