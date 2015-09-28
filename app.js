@@ -11,16 +11,18 @@ var ftpType = {
     DIR: 1
 };
 
+
 var 
 	choice = '0',
-    env = 'sit',
+    env = 'acceptance',
     ftpConf = conf.ftpConf[env],
     ftp,
     pass,// = fs.readFileSync(conf.ftpPass, 'utf8',);//[ftpConf.auth.authKey]; 
-    path = withSlash('/_repository/_resources/_xml'),
+    path = withSlash('/_repository/_resources/_xml/en/US'),
     remotepath = ftpConf.remoteDir + path,
     regname=/^banners\.xml$/,
-    regdirexclude=[/_backup\.menu/]
+    regdirexclude = [/_backup\.menu/],
+    recursivesearch=false
 ;
 
 init();
@@ -109,7 +111,7 @@ function searchFor(path, regEx) {
                         }
                     })
                 );
-                if (arrDir.length > 0) { 
+                if (arrDir.length > 0 && recursivesearch) { 
                     searchIn(arrDir.pop().remotepathname, regEx)
                 } else { 
                     d.resolve(arrFiles);
@@ -117,7 +119,6 @@ function searchFor(path, regEx) {
             },
             logErr
         );
-        
     }
     searchIn(path, regEx);
     return d.promise;
