@@ -1,14 +1,17 @@
 {
-  "name": "rb_sync",
-  "version": "1.0.0",
-  "description": "",
-  "main": "main.js",
-  "author": "el paf",
-  "license": "ISC",
-  "devDependencies": {
-    "grunt": "^0.4.5",
+  "name": "syncfy",
+  "version": "0.0.0",
+  "description": "syncfy",
+  "main": "app.js",
+  "author": {
+    "name": "vinz",
+    "email": ""
+  },
+  "dependencies": {
+    "jquery": "^2.1.4",
     "jsftp": "^1.5.2",
     "lodash": "^3.10.1",
-    "when": "^3.7.3"
+    "mkdirp": "^0.5.1",
+    "q": "^1.4.1"
   }
 }

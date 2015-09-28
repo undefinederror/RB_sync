@@ -2,7 +2,8 @@ module.exports = function(grunt){
 	'use strict';
 	
 	var _= require('lodash');
-	var when =  require('when');
+	//var when =  require('when');
+	var Q = require('q');
 	var JSftp = require('jsftp');
 	
 	grunt.initConfig({
@@ -37,6 +38,7 @@ module.exports = function(grunt){
 		grunt.file.mkdir(grunt.config('localdest'));
 	});
 	grunt.registerTask('get','get files from remote',function(){
+		var done=this.async();
 		var
 			//done = this.async(),
 			choice='0',
@@ -52,7 +54,16 @@ module.exports = function(grunt){
 		//	//console.log(JSON.stringify(data, null, 2));
 		//});
 		function auth(){
-			return when(ftp.auth(ftp.username,ftp.password));
+			var d=Q.defer();
+			console.log('connecting ...');
+			ftp.auth(ftp.username,ftp.password,function(err,res){
+				if (err) {
+					d.reject(new Error(err));
+				}else{
+					d.resolve(res);
+				}
+			});
+			return d.promise;
 		}
 		//	//,function(err,res){
 		//	//	grunt.log.writeln('connecting to '+ ftp.host+ '...\r');
@@ -66,17 +77,47 @@ module.exports = function(grunt){
 		//}
 		
 		function list(){
-			return when(ftp.ls("/ray-ban.com/rbdev/Views/StoreLocator"));
+			var d=Q.defer();
+			console.log('getting list ...');
+			ftp.ls("/ray-ban.com/rbdev/Views/StoreLocator",function(err,res){
+				if (err) {
+					d.reject(new Error(err));
+				}else{
+					d.resolve(res);
+				}
+			});
+			return d.promise;
 		}
 		
 		
 		//grunt.log.writeln(JSON.stringify(conf));
+		//auth()
+		//.then(list)
+		//.then(function(){
+		//	console.log('err ' + err);
+		//	console.log('res ' + res);
+		//});
+		
+		//function wait3(){
+		//	var c=0;
+		//	function x(){
+		//		if (c>8) {
+		//			return c;
+		//		}else{
+		//			setTimeout(x,500);
+		//		}
+		//	}
+		//	return x;
+		//}
 		auth()
-		.then(list)
-		.then(function(err,res){
-			console.log('err ' + err);
-			console.log('res ' + res);
-		});
+			.fail(function(err){console.log(err);done()})
+			.then(list)
+				.then(function(res){
+					console.log(res);
+				});
+		//.then(function(){console.log('DONE!')})
+		;
+		
 	});
 	
 	
