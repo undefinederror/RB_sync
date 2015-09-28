@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
 VisualStudioVersion = 12.0.40629.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}") = "syncfy", "syncfy.njsproj", "{22C55076-3CE5-4FE2-99E0-F051B87CBBB1}"
+Project("{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}") = "RB_sync", "RB_sync.njsproj", "{22C55076-3CE5-4FE2-99E0-F051B87CBBB1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
