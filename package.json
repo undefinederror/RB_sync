@@ -1,10 +1,10 @@
 {
-  "name": "syncfy",
+  "name": "RB_sync",
   "version": "0.0.0",
-  "description": "syncfy",
+  "description": "RB_sync",
   "main": "app.js",
   "author": {
-    "name": "vinz",
+    "name": "el paf",
     "email": ""
   },
   "dependencies": {
