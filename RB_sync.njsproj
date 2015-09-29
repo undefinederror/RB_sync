@@ -33,6 +33,7 @@
   <ItemGroup>
     <Compile Include="app.js" />
     <Compile Include="conf.js" />
+    <Compile Include="testJQ.js2" />
     <Content Include=".ftppass" />
     <Content Include="package.json" />
     <Content Include="README.md" />

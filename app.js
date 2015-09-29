@@ -3,7 +3,7 @@ var conf = require('./conf.js');
 var JSftp = require('jsftp');
 var mkdirp = require('mkdirp');
 var _ = require('lodash');
-var $ = require('jquery');
+//var $ = require('jquery');
 var fs = require('fs');
 var q = require('q');
 var ftpType = {
@@ -18,11 +18,11 @@ var
     ftpConf = conf.ftpConf[env],
     ftp,
     pass,// = fs.readFileSync(conf.ftpPass, 'utf8',);//[ftpConf.auth.authKey]; 
-    path = withSlash('/_repository/_resources/_xml/en/US'),
+    path = withSlash('/Views'),
     remotepath = ftpConf.remoteDir + path,
-    regname=/^banners\.xml$/,
-    regdirexclude = [/_backup\.menu/],
-    recursivesearch=false
+    regname=/HK\.resx$/i,
+    regdirexclude = [/^\.resx$/],
+    recursivesearch=true
 ;
 
 init();

@@ -4,11 +4,9 @@
   "description": "RB_sync",
   "main": "app.js",
   "author": {
-    "name": "el paf",
-    "email": ""
+    "name": "el paf"
   },
   "dependencies": {
-    "jquery": "^2.1.4",
     "jsftp": "^1.5.2",
     "lodash": "^3.10.1",
     "mkdirp": "^0.5.1",
