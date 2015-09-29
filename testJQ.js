@@ -1,46 +1,65 @@
-﻿var jsdom = require('jsdom').jsdom().defaultView;
+﻿global.DOMParser = require('xmldom').DOMParser;
+//global.XMLSerializer = require('xmldom').XMLSerializer;
+var jsdom = require('jsdom').jsdom().defaultView;
 var $ = require('jquery')(jsdom);
 var fs = require('fs');
 var q = require('q');
+var _ = require('lodash');
 var filepath = {
     ENV1: 'local/rb_acceptance/_repository/_resources/_xml/en/US/banners.xml',
     ENV2: 'local/rb_dev/_repository/_resources/_xml/en/US/banners.xml',
 }
-var target = {
+var selector = {
     DEKSTOP: 'target[base-rule-id=18]',
     MOBILE: 'target[base-rule-id=266]'
 }
+var target = {
+    DEKSTOP: 'DEKSTOP',
+    MOBILE: 'MOBILE'
+}
+var xmlAcc = fs.readFileSync(filepath.ENV1, 'utf-8');
+var xmlDev = fs.readFileSync(filepath.ENV2, 'utf-8');
 
 init();
 
 function init() {
-    var xml1, xml2, $xml1, $xml2;
-    //get xml
-    P(fs.readFile, fs, filepath.ENV1, 'utf-8')
-    .then(function (r) {
-        $xml1 = $(r);
-        return P(fs.readFile, fs, filepath.ENV2, 'utf-8');
-    })
-    .then(function (r) {
-        $xml2 = $(r);
-        return q.resolve();
-    })
-    .then(function (r) {
-        goOn();
-    });
-    
-    function goOn() {
         // put mobile nodes from acceptance to rbdev
-        var accNodes = getNodes($xml1);
-        var rbdevNodes = getNodes($xml2);
+        //var accNodes = getNodes($xml1);
+        //var rbdevNodes = getNodes($xml2);
         
-        var final = $xml2.remove(rbdevNodes.mob).append(accNodes.mob);
-        var strXml = final.outerHTML;
-        console.log(strXMl);
+        //var final = $xml2.remove(rbdevNodes.mob).append(accNodes.mob);
+        //var strXml = final.outerHTML;
+        //console.log(strXMl);
+    var $final = swapTargetsAccrossXml(xmlAcc, xmlDev, target.MOBILE);
+    var finalXml = $final.get().toString();
+    fs.writeFileSync('bannes.xml', finalXml, 'utf-8');
+    console.log('done');
     
     
     
+}
+function swapTargetsAccrossXml(xmlFrom, xmlTo, what) {
+    var $xmlTo = $($.parseXML(xmlTo));
+    var $xmlFrom = $($.parseXML(xmlFrom));
+    var $clone = $xmlFrom.find('item').filter(function () {
+        return !!$(this).find(selector[what])[0]
+    }).clone();
+    $xmlTo.find('item').filter(function () {
+        return !!$(this).find(selector[what])[0]
+    }).remove();
+    $xmlTo.find('items').append($clone);
+
+    return $xmlTo;
+}
+function cleanXml(xml, opt) {
+    var $xml = $($.parseXML(xml));
+    if (opt.noOffline) { 
+        $xml.find('item[offline=false]').remove();
     }
+    if (opt.sort) {
+        _.sort($xml.find('item'), function ($item) { return $item.attr('id') });
+    }
+    return $xml.get().toString();
 }
 function getNodes($xml) {
     var $items = $xml.find('item'),
