@@ -13,7 +13,7 @@
     <ProjectGuid>22c55076-3ce5-4fe2-99e0-f051b87cbbb1</ProjectGuid>
     <ProjectHome>
     </ProjectHome>
-    <StartupFile>app.js</StartupFile>
+    <StartupFile>testJQ.js</StartupFile>
     <StartWebBrowser>False</StartWebBrowser>
     <SearchPath>
     </SearchPath>
@@ -33,7 +33,7 @@
   <ItemGroup>
     <Compile Include="app.js" />
     <Compile Include="conf.js" />
-    <Compile Include="testJQ.js2" />
+    <Compile Include="testJQ.js" />
     <Content Include=".ftppass" />
     <Content Include="package.json" />
     <Content Include="README.md" />

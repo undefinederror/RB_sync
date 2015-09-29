@@ -192,3 +192,4 @@ ModelManifest.xml
 .ftppass
 # localfiles
 local/
+.ntvs_analysis.dat
