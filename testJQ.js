@@ -5,20 +5,27 @@ var $ = require('jquery')(jsdom);
 var fs = require('fs');
 var q = require('q');
 var _ = require('lodash');
+var beautify = require('js-beautify');
 var filepath = {
     ENV1: 'local/rb_acceptance/_repository/_resources/_xml/en/US/banners.xml',
     ENV2: 'local/rb_dev/_repository/_resources/_xml/en/US/banners.xml',
 }
 var selector = {
-    DEKSTOP: 'target[base-rule-id=18]',
-    MOBILE: 'target[base-rule-id=266]'
+    desktop: 'target[base-rule-id=18]',
+    mobile: 'target[base-rule-id=266]'
 }
 var target = {
-    DEKSTOP: 'DEKSTOP',
-    MOBILE: 'MOBILE'
+    DEKSTOP: 'desktop',
+    MOBILE: 'mobile'
 }
 var xmlAcc = fs.readFileSync(filepath.ENV1, 'utf-8');
 var xmlDev = fs.readFileSync(filepath.ENV2, 'utf-8');
+
+opt = {
+    noOffline:true,
+    sort: true,
+    beautify:true
+}
 
 init();
 
@@ -30,17 +37,17 @@ function init() {
         //var final = $xml2.remove(rbdevNodes.mob).append(accNodes.mob);
         //var strXml = final.outerHTML;
         //console.log(strXMl);
-    var $final = swapTargetsAccrossXml(xmlAcc, xmlDev, target.MOBILE);
-    var finalXml = $final.get().toString();
-    fs.writeFileSync('bannes.xml', finalXml, 'utf-8');
+    var swappedXml= swapTargetsAccrossXml($.parseXML(xmlAcc), $.parseXML(xmlDev), target.MOBILE);
+    swappedXml = cleanXml(swappedXml, opt);
+    fs.writeFileSync('bannes.xml', swappedXml.toString(), 'utf-8');
     console.log('done');
     
     
     
 }
 function swapTargetsAccrossXml(xmlFrom, xmlTo, what) {
-    var $xmlTo = $($.parseXML(xmlTo));
-    var $xmlFrom = $($.parseXML(xmlFrom));
+    var $xmlTo = $(xmlTo);
+    var $xmlFrom = $(xmlFrom);
     var $clone = $xmlFrom.find('item').filter(function () {
         return !!$(this).find(selector[what])[0]
     }).clone();
@@ -49,17 +56,32 @@ function swapTargetsAccrossXml(xmlFrom, xmlTo, what) {
     }).remove();
     $xmlTo.find('items').append($clone);
 
-    return $xmlTo;
+    return $xmlTo.get(0);
 }
 function cleanXml(xml, opt) {
-    var $xml = $($.parseXML(xml));
-    if (opt.noOffline) { 
-        $xml.find('item[offline=false]').remove();
+    var $xml = $(xml);
+    var $items = $xml.find('item').clone();
+    var arrItems, bool = false;
+
+    if (opt.noOffline) {
+        $items.filter('[offline=false]').remove();
+        bool = true;
     }
     if (opt.sort) {
-        _.sort($xml.find('item'), function ($item) { return $item.attr('id') });
+        arrItems=_.sortBy($items, function (item) { return $(item).find('target').eq(0).attr('cell-id')|0 });
+        arrItems= _.sortBy(arrItems, function (item) { return $(item).find('target').eq(0).attr('base-rule-id') | 0 });
+        bool = true;
     }
-    return $xml.get().toString();
+    if (bool) {
+        $xml.find('items')
+        .text('')
+        .children().remove()
+        .end().append($(arrItems));
+    }
+    if (opt.beautify) { 
+        $xml =$($.parseXML(beautify.html($xml.get().toString())));
+    }
+    return $xml.get(0);
 }
 function getNodes($xml) {
     var $items = $xml.find('item'),

@@ -6,6 +6,9 @@ var _ = require('lodash');
 //var $ = require('jquery');
 var fs = require('fs');
 var q = require('q');
+global.DOMParser = require('xmldom').DOMParser;
+var jsdom = require('jsdom').jsdom().defaultView;
+var $ = require('jquery')(jsdom);
 var ftpType = {
     FILE: 0,
     DIR: 1
@@ -22,7 +25,7 @@ var
     remotepath = ftpConf.remoteDir + path,
     regname = /^banners\.xml$/i,
     regdirexclude = [/^\.resx$/],
-    recursivesearch = true
+    recursivesearch = false
 ;
 
 init();
