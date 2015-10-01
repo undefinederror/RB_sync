@@ -13,7 +13,7 @@
     <ProjectGuid>22c55076-3ce5-4fe2-99e0-f051b87cbbb1</ProjectGuid>
     <ProjectHome>
     </ProjectHome>
-    <StartupFile>testJQ.js</StartupFile>
+    <StartupFile>apps.js</StartupFile>
     <StartWebBrowser>False</StartWebBrowser>
     <SearchPath>
     </SearchPath>
@@ -32,8 +32,11 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="app.js" />
-    <Compile Include="conf.js" />
+    <Compile Include="apps.js" />
+    <Compile Include="appConf.js" />
+    <Compile Include="taskConf.js" />
     <Compile Include="testJQ.js" />
+    <Compile Include="this_modules\ftp.js" />
     <Content Include=".ftppass" />
     <Content Include="package.json" />
     <Content Include="README.md" />
@@ -46,6 +49,7 @@
     <Folder Include="local\rb_dev\_repository\_resources\_xml\" />
     <Folder Include="local\rb_dev\_repository\_resources\_xml\en\" />
     <Folder Include="local\rb_dev\_repository\_resources\_xml\en\US\" />
+    <Folder Include="this_modules\" />
   </ItemGroup>
   <!-- Do not delete the following Import Project.  While this appears to do nothing it is a marker for setting TypeScript properties before our import that depends on them. -->
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.targets" Condition="False" />

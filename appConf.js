@@ -1,13 +1,12 @@
 ﻿module.exports =
 {
+    ENV:{
+        SIT: 'sit',
+        ACCEPTANCE: 'acceptance',
+        PROD: 'prod'
+    },
     localdest: 'local',
     ftpPass: '.ftppass',
-    get: {
-        0: 'sit',
-        1: 'acceptance',
-        2: 'prod'
-    },
-    //ftpConf:null,
     ftpConf: {
         sit: {
             authKey: 'rb_dev',

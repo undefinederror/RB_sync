@@ -1,42 +1,42 @@
-﻿global.DOMParser = require('xmldom').DOMParser;
-//global.XMLSerializer = require('xmldom').XMLSerializer;
+﻿
+// modules
+global.DOMParser = require('xmldom').DOMParser;
 var jsdom = require('jsdom').jsdom().defaultView;
 var $ = require('jquery')(jsdom);
 var fs = require('fs');
-var q = require('q');
 var _ = require('lodash');
 var beautify = require('js-beautify');
+
+
+// conf
 var filepath = {
-    ENV1: 'local/rb_acceptance/_repository/_resources/_xml/en/US/banners.xml',
-    ENV2: 'local/rb_dev/_repository/_resources/_xml/en/US/banners.xml',
+    FILE1: 'local/rb_acceptance/_repository/_resources/_xml/en/US/banners.xml',
+    FILE2: 'local/rb_dev/_repository/_resources/_xml/en/US/banners.xml',
 }
-var selector = {
+
+// const
+const selector = {
     desktop: 'target[base-rule-id=18]',
     mobile: 'target[base-rule-id=266]'
 }
-var target = {
+const target = {
     DEKSTOP: 'desktop',
     MOBILE: 'mobile'
 }
-var xmlAcc = fs.readFileSync(filepath.ENV1, 'utf-8');
-var xmlDev = fs.readFileSync(filepath.ENV2, 'utf-8');
+var xmlAcc = fs.readFileSync(filepath.FILE1, 'utf-8');
+var xmlDev = fs.readFileSync(filepath.FILE2, 'utf-8');
 
 opt = {
-    noOffline:true,
-    sort: true,
-    beautify:true
+    noOffline:false,
+    sort: false,
+    beautify:false
 }
 
 init();
 
 function init() {
-        // put mobile nodes from acceptance to rbdev
-        //var accNodes = getNodes($xml1);
-        //var rbdevNodes = getNodes($xml2);
-        
-        //var final = $xml2.remove(rbdevNodes.mob).append(accNodes.mob);
-        //var strXml = final.outerHTML;
-        //console.log(strXMl);
+    // put mobile nodes from acceptance to rbdev
+
     var swappedXml= swapTargetsAccrossXml($.parseXML(xmlAcc), $.parseXML(xmlDev), target.MOBILE);
     swappedXml = cleanXml(swappedXml, opt);
     fs.writeFileSync('bannes.xml', swappedXml.toString(), 'utf-8');
@@ -85,24 +85,9 @@ function cleanXml(xml, opt) {
 }
 function getNodes($xml) {
     var $items = $xml.find('item'),
-        $desk = $items.filter(function () { return !!$(this).find(target.DEKSTOP)[0] }),
-        $mob = $items.filter(function () { return !!$(this).find(target.MOBILE)[0] })
+        $desk = $items.filter(function () { return !!$(this).find(selector.DEKSTOP)[0] }),
+        $mob = $items.filter(function () { return !!$(this).find(selector.MOBILE)[0] })
         ;
     return { desk: $desk, mob: $mob };
 }
-function P(fn, _this) {
-    var args = [].slice.apply(arguments).slice(2),
-        _this = _this || null,
-        d = q.defer(),
-        callback = function (err, res) {
-            if (err) { d.reject(new Error(err)) }
-            else { d.resolve(res) }
-        }
-    ;
-    args.push(callback);
-    fn.apply(_this, args);
-    return d.promise;
-}
 
-
-function logErr(err) { console.log(err) }
