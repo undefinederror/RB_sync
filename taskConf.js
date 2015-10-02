@@ -1,18 +1,20 @@
-﻿var ENV = {
-    SIT: 'sit',
-    ACCEPTANCE: 'acceptance',
-    PROD: 'prod'
+﻿var CONST = require('./this_modules/const.js');
 
-}
-
-
-module.exports=
+module.exports =
 {
-    envs:[ENV.ACCEPTANCE,ENV.SIT],
-    path:'/_repository/_resources/_xml/en/',
-    regname:/^banners\.xml$/i,
-    regdirexclude:[/^\.resx$/],
-    recursivesearch: true,
-    limitEcomm: false,
-    ecomm:true
+    ftp: {
+        envs: [CONST.ENV.ACCEPTANCE, CONST.ENV.SIT],
+        path: '/_repository/_resources/_xml/en/US',
+        regname: /^banners\.xml$/i,
+        regdirexclude: [/^\.resx$/],
+        recursivesearch: true,
+        limitEcomm: false,
+        ecomm: true,
+    },
+    xml: {
+        toSwap:CONST.TARGET.MOBILE,
+        noOffline: true,
+        sort: true,
+        beautify: true,
+    }
 }

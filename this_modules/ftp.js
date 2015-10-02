@@ -8,16 +8,15 @@ var fs = require('fs');
 var q = require('q');
 
 // const
-const ftpType = {
-    FILE: 0,
-    DIR: 1
-};
+var CONST = require('./const.js');
+
 var methods = {
     searchFor: searchFor,
     getFromList: getFromList,
     auth:auth
 }
-var ftpPass=null;
+var ftpPass = null;
+
 function initFtp(conf,env) {
     ftpPass = ftpPass || fs.readFileSync(conf.appConf.ftpPass, 'utf8'); // caches after first invoke
     var authKey = conf.appConf.ftpConf[env].authKey; 
@@ -26,7 +25,8 @@ function initFtp(conf,env) {
     var o = {
         env: env,
         conf: conf,
-        ftp: new JSftp(conf.appConf.ftpConf[env].auth)
+        ftp: new JSftp(conf.appConf.ftpConf[env].auth),
+        resArr:[]
     }
     _.extend(o, methods);
     
@@ -71,7 +71,7 @@ function searchFor() {
             function (res) {
                 arrFiles = arrFiles.concat(
                     res.filter(function (o) {
-                        if (o.type === ftpType.FILE && o.name.match(_this.conf.taskConf.regname)) {
+                        if (o.type === CONST.FTPTYPE.FILE && o.name.match(_this.conf.taskConf.ftp.regname)) {
                             o.remotedir = path;
                             o.localdir = path.replace(
                                 _this.conf.appConf.ftpConf[_this.env].remoteDir, 
@@ -85,13 +85,13 @@ function searchFor() {
                 );
                 arrDir = arrDir.concat(
                     res.filter(function (o) {
-                        if (o.type === ftpType.DIR && !nMatch(o.name, _this.conf.taskConf.regdirexclude)) {
+                        if (o.type === CONST.FTPTYPE.DIR && !nMatch(o.name, _this.conf.taskConf.ftp.regdirexclude)) {
                             o.remotepathname = path + o.name;
                             return o;
                         }
                     })
                 );
-                if (arrDir.length > 0 && _this.conf.taskConf.recursivesearch) {
+                if (arrDir.length > 0 && _this.conf.taskConf.ftp.recursivesearch) {
                     searchIn(arrDir.pop().remotepathname)
                 } else {
                     d.resolve(_.map(arrFiles, function (o) {
@@ -103,12 +103,13 @@ function searchFor() {
         .catch(logErr)
         .done();
     }
-    searchIn(this.conf.appConf.ftpConf[this.env].remoteDir + this.conf.taskConf.path);
+    searchIn(this.conf.appConf.ftpConf[this.env].remoteDir + this.conf.taskConf.ftp.path);
     return d.promise;
 }
-function getFromList(arrFiles) {
+function getFromList() {
     var 
-        _this=this,
+        _this = this,
+        arrFiles = this.resArr.slice(0),
         d = q.defer(),
         arrDir = _.uniq(_.map(arrFiles, function (o) { return _this.conf.appConf.localdest + o.localdir }), true),
         arrPdir = _.map(arrDir, function (dir) { return P(mkdirp, null, dir) })

@@ -1,11 +1,7 @@
 ﻿module.exports =
 {
-    ENV:{
-        SIT: 'sit',
-        ACCEPTANCE: 'acceptance',
-        PROD: 'prod'
-    },
     localdest: 'local',
+    resultdest: 'result',
     ftpPass: '.ftppass',
     ftpConf: {
         sit: {

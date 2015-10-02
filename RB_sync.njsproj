@@ -13,7 +13,7 @@
     <ProjectGuid>22c55076-3ce5-4fe2-99e0-f051b87cbbb1</ProjectGuid>
     <ProjectHome>
     </ProjectHome>
-    <StartupFile>apps.js</StartupFile>
+    <StartupFile>app.js</StartupFile>
     <StartWebBrowser>False</StartWebBrowser>
     <SearchPath>
     </SearchPath>
@@ -32,11 +32,11 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="app.js" />
-    <Compile Include="apps.js" />
     <Compile Include="appConf.js" />
     <Compile Include="taskConf.js" />
-    <Compile Include="testJQ.js" />
+    <Compile Include="this_modules\const.js" />
     <Compile Include="this_modules\ftp.js" />
+    <Compile Include="this_modules\xml.js" />
     <Content Include=".ftppass" />
     <Content Include="package.json" />
     <Content Include="README.md" />
