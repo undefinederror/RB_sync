@@ -23,10 +23,12 @@ function init() {
     })
     .then(function (res) {
         // list of files found, per ftp instance
+        tfpArr[0].resArr = res[0];
+        tfpArr[1].resArr = res[1];
         return q.all([ftpArr[0].getFromList(res[0]), ftpArr[1].getFromList(res[1])]);
     })
     .then(function (res) {
-        // list of files found, per ftp instance
+        // files downloaded locally
         console.log('DONE!')
     })
     .catch(function (err) {new Error(err) })

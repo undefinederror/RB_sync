@@ -94,7 +94,9 @@ function searchFor() {
                 if (arrDir.length > 0 && _this.conf.taskConf.recursivesearch) {
                     searchIn(arrDir.pop().remotepathname)
                 } else {
-                    d.resolve(arrFiles);
+                    d.resolve(_.map(arrFiles, function (o) {
+                        return _.pick(o, ['name','remotedir', 'localdir', 'remotepathname', 'localpathname']);
+                    }));
                 }
             }
         )
