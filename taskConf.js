@@ -9,10 +9,10 @@
 module.exports=
 {
     envs:[ENV.ACCEPTANCE,ENV.SIT],
-    path:'/_repository/_resources/_xml/en/US/',
+    path:'/_repository/_resources/_xml/en/',
     regname:/^banners\.xml$/i,
     regdirexclude:[/^\.resx$/],
-    recursivesearch: false,
+    recursivesearch: true,
     limitEcomm: false,
     ecomm:true
 }

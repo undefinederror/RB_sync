@@ -7,15 +7,27 @@ var conf = {
 
 // modules
 var q = require('q');
+var _ftp = require('./this_modules/ftp.js');
 init();
 
 
 function init() {
-    var ftpAcc = require('./this_modules/ftp.js')(conf, conf.appConf.ENV.ACCEPTANCE);
-    var ftpSit = require('./this_modules/ftp.js')(conf, conf.appConf.ENV.SIT);
-    q.all([ftpAcc, ftpSit])
-    .then(function () { 
-        console.log('logged');
+    var ftpArr = [
+        _ftp(conf, conf.appConf.ENV.ACCEPTANCE),
+        _ftp(conf, conf.appConf.ENV.SIT)
+    ];
+    q.all([ftpArr[0].auth(), ftpArr[1].auth()])
+    .then(function () {
+        // ftps authenticated, ready to use
+        return q.all([ftpArr[0].searchFor(), ftpArr[1].searchFor()]);
+    })
+    .then(function (res) {
+        // list of files found, per ftp instance
+        return q.all([ftpArr[0].getFromList(res[0]), ftpArr[1].getFromList(res[1])]);
+    })
+    .then(function (res) {
+        // list of files found, per ftp instance
+        console.log('DONE!')
     })
     .catch(function (err) {new Error(err) })
     .done();
