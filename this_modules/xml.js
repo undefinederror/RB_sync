@@ -1,4 +1,7 @@
-﻿module.exports = init;
+﻿module.exports = {
+    init: init, 
+    serialiseCountryXML: serialiseCountryXML
+};
 
 // modules
 global.DOMParser = require('xmldom').DOMParser;
@@ -118,5 +121,37 @@ function P(fn, _this) {
     ;
     args.push(callback);
     fn.apply(_this, args);
+    return d.promise;
+}
+function getCtryXML(o) {
+    var d = q.defer();
+    P(o.ftp.get, o.ftp, o.conf.appConf.ftpConf[o.env].remoteDir + '/_repository/_resources/_xml/countries.xml')
+    .then(function () { 
+        d.resolve();
+    });
+    return d.promise;
+}
+function serialiseCountryXML(o) {
+    var d = q.defer(), dGet = q.defer();
+    if (o.conf.taskConf.ftp.refreshCtryXML) {
+        getCtryXML(o).then(function () { dGet.resolve(); })
+    } else {
+        dGet.resolve();
+    }
+    dGet.then(function () {
+        var file = fs.readFileSync(o.conf.appConf.ctryXML);
+        var xml = $.parseXML(file);
+        var arr = $(xml).find('country').filter(function (idx, ctry) {
+            return ($(ctry).attr('ecommerce') && $(ctry).attr('ecommerce').toString().toLowerCase() === 'true') || 
+            $(ctry).is('[ecommerce-provider]')
+        }).map(function (idx, ctry) {
+            return $(ctry).attr('lang').replace('-', '/');
+        });
+        o.a
+    });
+    
+
+    
+   
     return d.promise;
 }

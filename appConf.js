@@ -2,6 +2,7 @@
 {
     localdest: 'local',
     resultdest: 'result',
+    ctryXML: 'country.xml',
     ftpPass: '.ftppass',
     ftpConf: {
         sit: {

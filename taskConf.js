@@ -5,11 +5,12 @@ module.exports =
     ftp: {
         envs: [CONST.ENV.ACCEPTANCE, CONST.ENV.SIT],
         path: '/_repository/_resources/_xml/en/US',
-        regname: /^banners\.xml$/i,
+        regname: /^featurelist\.xml$/i,
         regdirexclude: [/^\.resx$/],
-        recursivesearch: true,
+        recursivesearch: false,
         limitEcomm: false,
         ecomm: true,
+        refreshCtryXML:false
     },
     xml: {
         toSwap:CONST.TARGET.MOBILE,

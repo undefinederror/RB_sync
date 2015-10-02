@@ -31,7 +31,7 @@ function init() {
     .then(function (res) {
         // files downloaded locally
         console.log('DONE GETTING')
-        return _xml(ftpArr);
+        return _xml.init(ftpArr);
     })
     .then(function (fileNotFound) {
         console.log('DONE SWAPPING')
@@ -41,6 +41,10 @@ function init() {
         }
     })
     .catch(function (err) {new Error(err) })
-    .done();
+    .done(function () {
+        console.log(CONST.YO);
+        ftpArr[0].ftp.raw.quit();
+        ftpArr[1].ftp.raw.quit();
+    });
 
 }

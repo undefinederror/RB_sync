@@ -31,11 +31,7 @@ function initFtp(conf,env) {
     _.extend(o, methods);
     
     return o;
-    // return promise with authenticated ftp
-    //return P(o.ftp.auth, o.ftp, o.ftp.username, o.ftp.password)
-   
-    // should be equivalent to this below, but this below doesn't work
-    //return q.nbind(o.ftp.username, o.ftp)(o.ftp.username, o.ftp.password)
+    // return object which wraps ftp object
 }
 
 // functions
