@@ -12,7 +12,7 @@ var q = require('q');
 var mkdirp = require('mkdirp');
 var _ = require('lodash');
 var beautify = require('js-beautify');
-
+var fn = require('./fn.js');
 
 // const
 var selector = {
@@ -26,19 +26,20 @@ var xmlOpt = null;
 
 function init(ftpArr) {
     // put [what] nodes from [from] to [to]
-    var d = q.defer();
+    var d = q.defer(), appConf = ftpArr[0].conf.appConf;
     xmlOpt = ftpArr[0].conf.taskConf.xml;
+    
     
     var filesNotFound = [], filesDone=[];
     ftpArr[0].resArr.forEach(function (o) {
-        var fileFrom = fs.readFileSync(ftpArr[0].conf.appConf.localdest + o.localpathname, CONST.FILEENC);
-        var fileTo = fs.readFileSync(ftpArr[0].conf.appConf.localdest + o.localpathname.replace(ftpArr[0].conf.appConf.ftpConf[ftpArr[0].env].localDir, ftpArr[0].conf.appConf.ftpConf[ftpArr[1].env].localDir), CONST.FILEENC); // fix with right path on other ftp
+        var fileFrom = fs.readFileSync(appConf.localdest + o.localpathname, CONST.FILEENC);
+        var fileTo = fs.readFileSync(appConf.localdest + o.localpathname.replace(appConf.ftpConf[ftpArr[0].env].localDir, appConf.ftpConf[ftpArr[1].env].localDir), CONST.FILEENC);
         if (!fileTo) {
             filesNotFound.push(o);
             checkResolve();
             return;
         }
-        var resultdir = ftpArr[0].conf.appConf.resultdest + o.localdir.replace(ftpArr[0].conf.appConf.ftpConf[ftpArr[0].env].localDir, '');
+        var resultdir = appConf.resultdest + o.localdir.replace(appConf.ftpConf[ftpArr[0].env].localDir, '');
         var resultpathname = resultdir + o.name;
         mkdirp.sync(resultdir);
         callDoFile(fileFrom, fileTo, resultpathname);
@@ -110,22 +111,9 @@ function getNodes($xml) {
         ;
     return { desk: $desk, mob: $mob };
 }
-function P(fn, _this) {
-    var args = [].slice.apply(arguments).slice(2),
-        _this = _this || null,
-        d = q.defer(),
-        callback = function (err, res) {
-            if (err) { d.reject(new Error(err)) }
-            else { d.resolve(res) }
-        }
-    ;
-    args.push(callback);
-    fn.apply(_this, args);
-    return d.promise;
-}
 function getCtryXML(o) {
     var d = q.defer();
-    P(o.ftp.get, o.ftp, o.conf.appConf.ftpConf[o.env].remoteDir + '/_repository/_resources/_xml/countries.xml')
+    fn.P(o.ftp.get, o.ftp, o.conf.appConf.ftpConf[o.env].remoteDir + '/_repository/_resources/_xml/countries.xml', o.conf.appConf.countryXML)
     .then(function () { 
         d.resolve();
     });
@@ -139,19 +127,27 @@ function serialiseCountryXML(o) {
         dGet.resolve();
     }
     dGet.then(function () {
-        var file = fs.readFileSync(o.conf.appConf.ctryXML);
-        var xml = $.parseXML(file);
-        var arr = $(xml).find('country').filter(function (idx, ctry) {
-            return ($(ctry).attr('ecommerce') && $(ctry).attr('ecommerce').toString().toLowerCase() === 'true') || 
-            $(ctry).is('[ecommerce-provider]')
-        }).map(function (idx, ctry) {
-            return $(ctry).attr('lang').replace('-', '/');
-        });
-        o.a
+        var file = fs.readFileSync(o.conf.appConf.ctryXML),
+            xml = $.parseXML(file),
+            $ctry = $(xml).find('country'),
+            $ecomm = $ctry.filter(function (idx, ctry) {
+                return ($(ctry).attr('ecommerce') && $(ctry).attr('ecommerce').toString().toLowerCase() === 'true') || 
+                        $(ctry).is('[ecommerce-provider]')
+                ;
+            })
+            ;
+        
+        o.conf.taskConf.ftp.ecommFolderReg = {
+            ecomm: getArrFolderRegex($ecomm),
+            nonecomm: $ctry.not($ecomm)
+        }
+        
+        function getArrFolderRegex($coll) {
+            return $coll.map(function (idx, ctry) {
+                return new RegExp('/' + $(ctry).attr('lang').replace('-', '/') + '/', 'i');
+            });
+        }
     });
-    
-
-    
    
     return d.promise;
 }

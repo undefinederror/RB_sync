@@ -20,6 +20,10 @@ function init() {
     q.all([ftpArr[0].auth(), ftpArr[1].auth()])
     .then(function () {
         // ftps authenticated, ready to use
+        // if search entiles filtering based on country xml enrich ftp object
+        if (conf.taskConf.ftp.filterEcomm) { 
+            _xml.serialiseCountryXML(ftpArr[1]);
+        }
         return q.all([ftpArr[0].searchFor(), ftpArr[1].searchFor()]);
     })
     .then(function (res) {

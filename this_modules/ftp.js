@@ -6,6 +6,7 @@ var mkdirp = require('mkdirp');
 var _ = require('lodash');
 var fs = require('fs');
 var q = require('q');
+var fn = require('./fn.js');
 
 // const
 var CONST = require('./const.js');
@@ -18,7 +19,7 @@ var methods = {
 var ftpPass = null;
 
 function initFtp(conf,env) {
-    ftpPass = ftpPass || fs.readFileSync(conf.appConf.ftpPass, 'utf8'); // caches after first invoke
+    ftpPass = ftpPass || fs.readFileSync(conf.appConf.ftpPass, CONST.FILEENC); // caches after first invoke
     var authKey = conf.appConf.ftpConf[env].authKey; 
     var pass = JSON.parse(ftpPass)[authKey];
     _.extend(conf.appConf.ftpConf[env].auth, pass);
@@ -35,34 +36,12 @@ function initFtp(conf,env) {
 }
 
 // functions
-function nMatch(name, arg) {
-    var probe = arg;
-    if (!(arg instanceof Array)) {
-        probe = [arg];
-    }
-    return _.map(arg, function (reg) { return !!name.match(reg) * 1 })
-    .reduce(function (a, b) { return a + b });
-}
-function logErr(err) { console.log(err) }
-function withSlash(name) { return (name.slice(-1) === '/'?name:name + '/') }
-function P(fn, _this) {
-    var args = [].slice.apply(arguments).slice(2),
-        _this = _this || null,
-        d = q.defer(),
-        callback = function (err, res) {
-            if (err) { d.reject(new Error(err)) }
-            else { d.resolve(res) }
-        }
-    ;
-    args.push(callback);
-    fn.apply(_this, args);
-    return d.promise;
-}
+
 function searchFor() {
     var _this=this, arrFiles = [], arrDir = [], d = q.defer();
     function searchIn(path) {
-        var path = withSlash(path);
-        P(_this.ftp.ls, _this.ftp, path)
+        var path = fn.withSlash(path);
+        fn.P(_this.ftp.ls, _this.ftp, path)
         .then(
             function (res) {
                 arrFiles = arrFiles.concat(
@@ -81,7 +60,7 @@ function searchFor() {
                 );
                 arrDir = arrDir.concat(
                     res.filter(function (o) {
-                        if (o.type === CONST.FTPTYPE.DIR && !nMatch(o.name, _this.conf.taskConf.ftp.regdirexclude)) {
+                        if (o.type === CONST.FTPTYPE.DIR && !fn.nMatch(o.name, _this.conf.taskConf.ftp.regdirexclude)) {
                             o.remotepathname = path + o.name;
                             return o;
                         }
@@ -90,6 +69,11 @@ function searchFor() {
                 if (arrDir.length > 0 && _this.conf.taskConf.ftp.recursivesearch) {
                     searchIn(arrDir.pop().remotepathname)
                 } else {
+                    if (_this.conf.taskConf.ftp.filterEcomm) {
+                        arrFiles = arrFiles.filter(function (o) {
+                            return fn.nMatch(o.remotedir, _this.conf.taskConf.ftp.ecommFolderReg[_this.conf.taskConf.tfp.filterEcomm]);
+                        })
+                    }
                     d.resolve(_.map(arrFiles, function (o) {
                         return _.pick(o, ['name','remotedir', 'localdir', 'remotepathname', 'localpathname']);
                     }));
@@ -108,7 +92,7 @@ function getFromList() {
         arrFiles = this.resArr.slice(0),
         d = q.defer(),
         arrDir = _.uniq(_.map(arrFiles, function (o) { return _this.conf.appConf.localdest + o.localdir }), true),
-        arrPdir = _.map(arrDir, function (dir) { return P(mkdirp, null, dir) })
+        arrPdir = _.map(arrDir, function (dir) { return fn.P(mkdirp, null, dir) })
         ;
     
     q.all(arrPdir)
@@ -118,7 +102,7 @@ function getFromList() {
     
     function getThis(o) {
         console.log('getting ', o.localpathname, '...');
-        P(_this.ftp.get, _this.ftp, o.remotepathname, _this.conf.appConf.localdest + o.localpathname)
+        fn.P(_this.ftp.get, _this.ftp, o.remotepathname, _this.conf.appConf.localdest + o.localpathname)
         .then(function () {
             if (arrFiles.length > 0) { getThis(arrFiles.shift()) }
             else { d.resolve(); }
@@ -127,5 +111,5 @@ function getFromList() {
     return d.promise;
 }
 function auth(){ 
-    return P(this.ftp.auth, this.ftp, this.ftp.username, this.ftp.password);
+    return fn.P(this.ftp.auth, this.ftp, this.ftp.username, this.ftp.password);
 }

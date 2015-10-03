@@ -35,6 +35,7 @@
     <Compile Include="appConf.js" />
     <Compile Include="taskConf.js" />
     <Compile Include="this_modules\const.js" />
+    <Compile Include="this_modules\fn.js" />
     <Compile Include="this_modules\ftp.js" />
     <Compile Include="this_modules\xml.js" />
     <Content Include=".ftppass" />

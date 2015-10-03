@@ -8,8 +8,7 @@ module.exports =
         regname: /^featurelist\.xml$/i,
         regdirexclude: [/^\.resx$/],
         recursivesearch: false,
-        limitEcomm: false,
-        ecomm: true,
+        filterEcomm: false, // 'ecomm' || 'nonecomm' || falsy,
         refreshCtryXML:false
     },
     xml: {
