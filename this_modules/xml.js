@@ -25,7 +25,7 @@ var CONST = require('./const.js');
 var xmlOpt = null;
 
 function init(ftpArr) {
-    // put [what] nodes from [from] to [to]
+    fn.konsole('copying ',ftpArr[0].conf.taskConf.xml.toSwap,' accross xml, from: ',ftpArr[0].conf.taskConf.ftp.envs[0],' to: ', ftpArr[0].conf.taskConf.ftp.envs[1])
     var d = q.defer(), appConf = ftpArr[0].conf.appConf;
     xmlOpt = ftpArr[0].conf.taskConf.xml;
     
@@ -33,12 +33,15 @@ function init(ftpArr) {
     var filesNotFound = [], filesDone=[];
     ftpArr[0].resArr.forEach(function (o) {
         var fileFrom = fs.readFileSync(appConf.localdest + o.localpathname, CONST.FILEENC);
-        var fileTo = fs.readFileSync(appConf.localdest + o.localpathname.replace(appConf.ftpConf[ftpArr[0].env].localDir, appConf.ftpConf[ftpArr[1].env].localDir), CONST.FILEENC);
-        if (!fileTo) {
+        var fileTo;
+        try {
+            fileTo = fs.readFileSync(appConf.localdest + o.localpathname.replace(appConf.ftpConf[ftpArr[0].env].localDir, appConf.ftpConf[ftpArr[1].env].localDir), CONST.FILEENC);
+        } catch (e) { 
             filesNotFound.push(o);
             checkResolve();
             return;
         }
+        
         var resultdir = appConf.resultdest + o.localdir.replace(appConf.ftpConf[ftpArr[0].env].localDir, '');
         var resultpathname = resultdir + o.name;
         mkdirp.sync(resultdir);
@@ -55,7 +58,7 @@ function init(ftpArr) {
         var swappedXml = swapTargetsAccrossXml($.parseXML(from), $.parseXML(to));
         swappedXml = cleanXml(swappedXml);
         fs.writeFileSync(resultpathname, swappedXml.toString(), CONST.FILEENC);
-        console.log('done ', resultpathname);
+        fn.konsole('done ', resultpathname);
     }
     
     function checkResolve() { 
@@ -112,6 +115,7 @@ function getNodes($xml) {
     return { desk: $desk, mob: $mob };
 }
 function getCtryXML(o) {
+    fn.konsole('getting country xml from: ', o.env);
     return fn.P(o.ftp.get, o.ftp, o.conf.appConf.ftpConf[o.env].remoteDir + '/_repository/_resources/_xml/countries.xml', o.conf.appConf.ctryXML)
 }
 function serialiseCountryXML(o) {
@@ -124,23 +128,27 @@ function serialiseCountryXML(o) {
         dGet.resolve();
     }
     dGet.promise.then(function () {
+        fn.konsole('working out ecommerce folders based on countries.xml')
         var file = fs.readFileSync(o.conf.appConf.ctryXML, CONST.FILEENC),
             xml = $.parseXML(file),
             $ctrys = $(xml).find('country'),
             $ecomm = $ctrys.filter(function (idx, ctry) {
-                return (!!$(ctry).attr('ecommerce') && $(ctry).attr('ecommerce').toString().toLowerCase() === 'true') || 
-                        !!$(ctry).attr('[ecommerce-provider]')
+                return ($(ctry).attr('ecommerce').toLowerCase() === 'true' || 
+                        !!$(ctry).attr('ecommerce-provider'))
                 ;
             })
         ;
         
         o.conf.taskConf.ftp.ecommFolderReg = {
-            ecomm: getArrFolderRegex($ecomm),
+            ecomm: getArrFolderRegex($ecomm).concat(o.conf.appConf.ecommNotInCtryXML),
             nonecomm: getArrFolderRegex($ctrys.not($ecomm))
         }
         
+        //o.conf.taskConf.ftp.ecommFolderReg.ecomm.forEach(function (item) { 
+        //    console.log('ecomm', item )
+        //})
         function getArrFolderRegex($coll) {
-            return $coll.map(function (idx, ctry) {
+            return $.map($coll, function (ctry) {
                 return new RegExp('/' + $(ctry).attr('lang').replace('-', '/') + '/', 'i');
             });
         }

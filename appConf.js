@@ -3,6 +3,10 @@
     localdest: 'local',
     resultdest: 'result',
     ctryXML: 'countries.xml',
+    ecommNotInCtryXML: [
+        new RegExp('/ja/', 'i'), 
+        new RegExp('/pl/', 'i')
+    ],
     ftpPass: '.ftppass',
     ftpConf: {
         sit: {

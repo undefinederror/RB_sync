@@ -20,6 +20,7 @@ function init() {
     ];
     q.all([ftpArr[0].auth(), ftpArr[1].auth()])
     .then(function () {
+        console.log('authenticated ..');
         // ftps authenticated
         // if search entiles filtering based on country xml enrich ftp object
         if (conf.taskConf.ftp.filterEcomm) {
@@ -30,24 +31,26 @@ function init() {
     })
     .then(function () {
         // ok, ready to go
+        fn.konsole('searching files ..');
         return q.all([ftpArr[0].searchFor(), ftpArr[1].searchFor()]);
     })
     .then(function (res) {
         // list of files found, per ftp instance
+        fn.konsole('getting files ..');
         ftpArr[0].resArr = res[0];
         ftpArr[1].resArr = res[1];
         return q.all([ftpArr[0].getFromList(), ftpArr[1].getFromList()]);
     })
     .then(function (res) {
         // files downloaded locally
-        console.log('DONE GETTING')
+        fn.konsole('DONE GETTING');
         return _xml.init(ftpArr);
     })
     .then(function (fileNotFound) {
-        console.log('DONE SWAPPING')
+        fn.konsole('DONE SWAPPING');
         if (fileNotFound.length) {
-            console.log(fileNotFound.length, ' not found');
-            console.log(fileNotFound);
+            fn.konsole(fileNotFound.length, ' not found');
+            fn.konsole(fileNotFound);
         }
     })
     .catch(fn.logErr)

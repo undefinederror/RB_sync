@@ -41,6 +41,7 @@ function searchFor() {
     var _this=this, arrFiles = [], arrDir = [], d = q.defer();
     function searchIn(path) {
         var path = fn.withSlash(path);
+        fn.konsole('scanning folder: ', path);
         fn.P(_this.ftp.ls, _this.ftp, path)
         .then(
             function (res) {
@@ -98,11 +99,12 @@ function getFromList() {
     
     q.all(arrPdir)
     .then(function () {
+        fn.konsole('folders created locally ..')
         getThis(arrFiles.shift());
     });
     
     function getThis(o) {
-        console.log('getting ', o.localpathname, '...');
+        fn.konsole('getting ', o.localpathname, '...');
         fn.P(_this.ftp.get, _this.ftp, o.remotepathname, _this.conf.appConf.localdest + o.localpathname)
         .then(function () {
             if (arrFiles.length > 0) { getThis(arrFiles.shift()) }

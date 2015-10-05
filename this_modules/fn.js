@@ -1,12 +1,14 @@
 ﻿var q = require('q');
 var _ = require('lodash');
+var verbose = require('../taskConf.js').verbose;
 
 module.exports =
 {
     nMatch: nMatch,
     logErr: logErr,
     withSlash: withSlash,
-    P: P
+    P: P,
+    konsole:konsole
 };
 
 
@@ -33,3 +35,4 @@ function P(fn, _this) {
     fn.apply(_this, args);
     return d.promise;
 }
+function konsole(){ if (verbose) console.log.apply(console,arguments);}
