@@ -112,17 +112,14 @@ function getNodes($xml) {
     return { desk: $desk, mob: $mob };
 }
 function getCtryXML(o) {
-    var d = q.defer();
-    fn.P(o.ftp.get, o.ftp, o.conf.appConf.ftpConf[o.env].remoteDir + '/_repository/_resources/_xml/countries.xml', o.conf.appConf.countryXML)
-    .then(function () { 
-        d.resolve();
-    });
-    return d.promise;
+    return fn.P(o.ftp.get, o.ftp, o.conf.appConf.ftpConf[o.env].remoteDir + '/_repository/_resources/_xml/countries.xml', o.conf.appConf.ctryXML)
 }
 function serialiseCountryXML(o) {
     var d = q.defer(), dGet = q.defer();
     if (o.conf.taskConf.ftp.refreshCtryXML) {
-        getCtryXML(o).then(function () { dGet.resolve(); })
+        getCtryXML(o).then(function () {
+            dGet.resolve();
+        })
     } else {
         dGet.resolve();
     }

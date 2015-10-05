@@ -8,8 +8,8 @@ module.exports =
         regname: /^featurelist\.xml$/i,
         regdirexclude: [/^\.resx$/],
         recursivesearch: false,
-        filterEcomm: false, // 'ecomm' || 'nonecomm' || falsy,
-        refreshCtryXML:false
+        filterEcomm: 'ecomm', // 'ecomm' || 'nonecomm' || falsy,
+        refreshCtryXML: true
     },
     xml: {
         toSwap:CONST.TARGET.MOBILE,
