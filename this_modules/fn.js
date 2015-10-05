@@ -1,4 +1,5 @@
 ﻿var q = require('q');
+var _ = require('lodash');
 
 module.exports =
 {
@@ -11,7 +12,7 @@ module.exports =
 
 function nMatch(name, arg) {
     var probe = arg;
-    if (!(arg instanceof Array)) {
+    if (!arg.map) {
         probe = [arg];
     }
     return _.map(arg, function (reg) { return !!name.match(reg) * 1 })

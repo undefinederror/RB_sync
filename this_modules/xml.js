@@ -119,24 +119,24 @@ function serialiseCountryXML(o) {
     if (o.conf.taskConf.ftp.refreshCtryXML) {
         getCtryXML(o).then(function () {
             dGet.resolve();
-        })
+        });
     } else {
         dGet.resolve();
     }
-    dGet.then(function () {
-        var file = fs.readFileSync(o.conf.appConf.ctryXML),
+    dGet.promise.then(function () {
+        var file = fs.readFileSync(o.conf.appConf.ctryXML, CONST.FILEENC),
             xml = $.parseXML(file),
-            $ctry = $(xml).find('country'),
-            $ecomm = $ctry.filter(function (idx, ctry) {
-                return ($(ctry).attr('ecommerce') && $(ctry).attr('ecommerce').toString().toLowerCase() === 'true') || 
-                        $(ctry).is('[ecommerce-provider]')
+            $ctrys = $(xml).find('country'),
+            $ecomm = $ctrys.filter(function (idx, ctry) {
+                return (!!$(ctry).attr('ecommerce') && $(ctry).attr('ecommerce').toString().toLowerCase() === 'true') || 
+                        !!$(ctry).attr('[ecommerce-provider]')
                 ;
             })
-            ;
+        ;
         
         o.conf.taskConf.ftp.ecommFolderReg = {
             ecomm: getArrFolderRegex($ecomm),
-            nonecomm: $ctry.not($ecomm)
+            nonecomm: getArrFolderRegex($ctrys.not($ecomm))
         }
         
         function getArrFolderRegex($coll) {
@@ -144,6 +144,8 @@ function serialiseCountryXML(o) {
                 return new RegExp('/' + $(ctry).attr('lang').replace('-', '/') + '/', 'i');
             });
         }
+
+        d.resolve();
     });
    
     return d.promise;

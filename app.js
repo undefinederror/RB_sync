@@ -9,6 +9,7 @@ var CONST=require('./this_modules/const.js')
 var q = require('q');
 var _ftp = require('./this_modules/ftp.js');
 var _xml = require('./this_modules/xml.js');
+var fn = require('./this_modules/fn.js');
 
 init();
 
@@ -49,11 +50,14 @@ function init() {
             console.log(fileNotFound);
         }
     })
-    .catch(function (err) {new Error(err) })
+    .catch(fn.logErr)
     .done(function () {
         console.log(CONST.YO);
         ftpArr[0].ftp.raw.quit();
         ftpArr[1].ftp.raw.quit();
-    });
+        return;
+        //process.exit();
+        }
+    );
 
 }

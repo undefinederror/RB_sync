@@ -71,16 +71,17 @@ function searchFor() {
                 } else {
                     if (_this.conf.taskConf.ftp.filterEcomm) {
                         arrFiles = arrFiles.filter(function (o) {
-                            return fn.nMatch(o.remotedir, _this.conf.taskConf.ftp.ecommFolderReg[_this.conf.taskConf.tfp.filterEcomm]);
-                        })
+                            return !!fn.nMatch(o.remotedir, _this.conf.taskConf.ftp.ecommFolderReg['ecomm']) === (_this.conf.taskConf.ftp.filterEcomm==='ecomm') ;
+                        });
                     }
                     d.resolve(_.map(arrFiles, function (o) {
+                       
                         return _.pick(o, ['name','remotedir', 'localdir', 'remotepathname', 'localpathname']);
                     }));
                 }
             }
         )
-        .catch(logErr)
+        .catch(fn.logErr)
         .done();
     }
     searchIn(this.conf.appConf.ftpConf[this.env].remoteDir + this.conf.taskConf.ftp.path);
