@@ -4,7 +4,7 @@
 var JSftp = require('jsftp');
 var mkdirp = require('mkdirp');
 var _ = require('lodash');
-var fs = require('fs');
+var fs = require('fs-extra');
 var q = require('q');
 var fn = require('./fn.js');
 
@@ -35,13 +35,12 @@ function initFtp(conf,env) {
     // return object which wraps ftp object
 }
 
-// functions
-
+// methods
 function searchFor() {
     var _this=this, arrFiles = [], arrDir = [], d = q.defer();
     function searchIn(path) {
         var path = fn.withSlash(path);
-        fn.konsole('scanning folder: ', path);
+        fn.konsole('scanning folder:', path);
         fn.P(_this.ftp.ls, _this.ftp, path)
         .then(
             function (res) {
@@ -104,7 +103,7 @@ function getFromList() {
     });
     
     function getThis(o) {
-        fn.konsole('getting ', o.localpathname, '...');
+        fn.konsole('getting', o.localpathname, '...');
         fn.P(_this.ftp.get, _this.ftp, o.remotepathname, _this.conf.appConf.localdest + o.localpathname)
         .then(function () {
             if (arrFiles.length > 0) { getThis(arrFiles.shift()) }

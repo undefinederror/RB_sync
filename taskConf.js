@@ -4,13 +4,14 @@ module.exports =
 {
     verbose:true,
     ftp: {
+        removeLocalFolders:true,
         envs: [CONST.ENV.ACCEPTANCE, CONST.ENV.PROD],
         path: '/_repository/_resources/_xml/',
         regname: /^banners\.xml$/i,
         regdirexclude: [/^_backup/i],
         recursivesearch: true,
         filterEcomm: 'ecomm', // 'ecomm' || 'nonecomm' || a falsy value,
-        refreshCtryXML: true
+        refreshCtryXML: false
     },
     xml: {
         toSwap:CONST.TARGET.MOBILE,

@@ -15,15 +15,20 @@ init();
 
 function init() {
     var ftpArr = [
-        _ftp(conf, CONST.ENV.ACCEPTANCE),
-        _ftp(conf, CONST.ENV.SIT)
+        _ftp(conf, conf.taskConf.ftp.envs[0]),
+        _ftp(conf, conf.taskConf.ftp.envs[1])
     ];
     q.all([ftpArr[0].auth(), ftpArr[1].auth()])
     .then(function () {
-        console.log('authenticated ..');
+        fn.konsole('authenticated ..');
         // ftps authenticated
+        // remove local folders if set in conf
+        return fn.checkRemoveLocalFolders();
+    })
+    .then(function () {
         // if search entiles filtering based on country xml enrich ftp object
         if (conf.taskConf.ftp.filterEcomm) {
+            fn.konsole(conf.taskConf.ftp.filterEcomm, 'filter applied. retrieving countries info');
             return _xml.serialiseCountryXML(ftpArr[1]);
         } else {
             return q.resolve()

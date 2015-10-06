@@ -1,6 +1,8 @@
 ﻿var q = require('q');
 var _ = require('lodash');
-var verbose = require('../taskConf.js').verbose;
+var fs = require('fs-extra');
+var taskConf = require('../taskConf.js');
+var appConf = require('../appConf.js');
 
 module.exports =
 {
@@ -8,7 +10,8 @@ module.exports =
     logErr: logErr,
     withSlash: withSlash,
     P: P,
-    konsole:konsole
+    konsole: konsole,
+    checkRemoveLocalFolders:checkRemoveLocalFolders
 };
 
 
@@ -35,4 +38,15 @@ function P(fn, _this) {
     fn.apply(_this, args);
     return d.promise;
 }
-function konsole(){ if (verbose) console.log.apply(console,arguments);}
+function konsole(){ if (taskConf.verbose) console.log.apply(console, arguments); }
+function checkRemoveLocalFolders() {
+    if (taskConf.ftp.removeLocalFolders) {
+        return q.all([
+            P(fs.emptyDir, fs, appConf.localdest),
+            P(fs.emptyDir, fs, appConf.resultdest),
+        ]);
+    }
+    else { 
+        return q.resolve();
+    }
+}

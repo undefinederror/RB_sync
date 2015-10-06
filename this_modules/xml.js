@@ -7,7 +7,7 @@
 global.DOMParser = require('xmldom').DOMParser;
 var jsdom = require('jsdom').jsdom().defaultView;
 var $ = require('jquery')(jsdom);
-var fs = require('fs');
+var fs = require('fs-extra');
 var q = require('q');
 var mkdirp = require('mkdirp');
 var _ = require('lodash');
@@ -19,13 +19,14 @@ var selector = {
     desktop: 'target[base-rule-id=18]',
     mobile: 'target[base-rule-id=266]'
 }
+var chinaReg = new RegExp('/cn/', 'i'); // not used for now. using cell-id number > o < 110
 var CONST = require('./const.js');
 
 //
 var xmlOpt = null;
 
 function init(ftpArr) {
-    fn.konsole('copying ',ftpArr[0].conf.taskConf.xml.toSwap,' accross xml, from: ',ftpArr[0].conf.taskConf.ftp.envs[0],' to: ', ftpArr[0].conf.taskConf.ftp.envs[1])
+    fn.konsole('copying',ftpArr[0].conf.taskConf.xml.toSwap,'accross xml, from:',ftpArr[0].conf.taskConf.ftp.envs[0],'to:', ftpArr[0].conf.taskConf.ftp.envs[1])
     var d = q.defer(), appConf = ftpArr[0].conf.appConf;
     xmlOpt = ftpArr[0].conf.taskConf.xml;
     
@@ -72,12 +73,8 @@ function init(ftpArr) {
 function swapTargetsAccrossXml(xmlFrom, xmlTo) {
     var $xmlTo = $(xmlTo);
     var $xmlFrom = $(xmlFrom);
-    var $clone = $xmlFrom.find('item').filter(function () {
-        return !!$(this).find(selector[xmlOpt.toSwap])[0]
-    }).clone();
-    $xmlTo.find('item').filter(function () {
-        return !!$(this).find(selector[xmlOpt.toSwap])[0]
-    }).remove();
+    var $clone = getNodes($xmlFrom)[xmlOpt.toSwap].clone();
+    getNodes($xmlTo)[xmlOpt.toSwap].remove();
     $xmlTo.find('items').append($clone);
     
     return $xmlTo.get(0);
@@ -88,7 +85,7 @@ function cleanXml(xml) {
     var arrItems, bool = false;
     
     if (xmlOpt.noOffline) {
-        $items.filter('[offline=false]').remove();
+        $items =$items.filter(function () { return $(this).attr('online').toLowerCase() === 'true' });
         bool = true;
     }
     if (xmlOpt.sort) {
@@ -109,13 +106,21 @@ function cleanXml(xml) {
 }
 function getNodes($xml) {
     var $items = $xml.find('item'),
-        $desk = $items.filter(function () { return !!$(this).find(selector.DEKSTOP)[0] }),
-        $mob = $items.filter(function () { return !!$(this).find(selector.MOBILE)[0] })
-        ;
-    return { desk: $desk, mob: $mob };
+        isChina = $items.filter(function () {
+            return !!$(this).find(selector.desktop)[0] &&
+            ($(this).find('target').attr('cell-id') | 0) > 110 
+        }).size()>0,
+        $desk = $items.filter(function () { return !!$(this).find(selector.desktop)[0] }),
+        $mob = $items.filter(function () { return !!$(this).find(selector.mobile)[0] })
+    ;
+    if (isChina) { 
+        $mob=$desk.filter(function () { return ($(this).find('target').attr('cell-id') | 0) > 110 })
+        $desk=$desk.filter(function () { return ($(this).find('target').attr('cell-id') | 0) < 110 })
+    } 
+    return { desktop: $desk, mobile: $mob };
 }
 function getCtryXML(o) {
-    fn.konsole('getting country xml from: ', o.env);
+    fn.konsole('getting country xml from:', o.env);
     return fn.P(o.ftp.get, o.ftp, o.conf.appConf.ftpConf[o.env].remoteDir + '/_repository/_resources/_xml/countries.xml', o.conf.appConf.ctryXML)
 }
 function serialiseCountryXML(o) {
