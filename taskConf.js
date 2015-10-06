@@ -8,7 +8,7 @@ module.exports =
         envs: [CONST.ENV.ACCEPTANCE, CONST.ENV.PROD],
         path: '/_repository/_resources/_xml/',
         regname: /^banners\.xml$/i,
-        regdirexclude: [/^_backup/i],
+        regdirexclude: [/^_backup/i,/^event/i, /^craft/i],
         recursivesearch: true,
         filterEcomm: 'ecomm', // 'ecomm' || 'nonecomm' || a falsy value,
         refreshCtryXML: false
