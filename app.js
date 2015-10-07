@@ -29,7 +29,7 @@ function init() {
         // if search entiles filtering based on country xml enrich ftp object
         if (conf.taskConf.ftp.filterEcomm) {
             fn.konsole(conf.taskConf.ftp.filterEcomm, 'filter applied. retrieving countries info');
-            return _xml.serialiseCountryXML(ftpArr[1]);
+            return _xml.processCountryXML(ftpArr[1]);
         } else {
             return q.resolve()
         }

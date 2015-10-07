@@ -1,6 +1,6 @@
 ﻿module.exports = {
     init: init, 
-    serialiseCountryXML: serialiseCountryXML
+    processCountryXML: processCountryXML
 };
 
 // modules
@@ -123,7 +123,7 @@ function getCtryXML(o) {
     fn.konsole('getting country xml from:', o.env);
     return fn.P(o.ftp.get, o.ftp, o.conf.appConf.ftpConf[o.env].remoteDir + '/_repository/_resources/_xml/countries.xml', o.conf.appConf.ctryXML)
 }
-function serialiseCountryXML(o) {
+function processCountryXML(o) {
     var d = q.defer(), dGet = q.defer();
     if (o.conf.taskConf.ftp.refreshCtryXML) {
         getCtryXML(o).then(function () {
