@@ -96,11 +96,18 @@ function getFromList() {
         arrPdir = _.map(arrDir, function (dir) { return fn.P(mkdirp, null, dir) })
         ;
     
+    if (!arrFiles.length) {
+        d.reject(new Error('no files found'));
+        return;
+    }
+
     q.all(arrPdir)
     .then(function () {
-        fn.konsole('folders created locally ..')
+        fn.konsole('folders created locally ..');
         getThis(arrFiles.shift());
-    });
+    })
+    .catch(function (err) { throw new Error(err) });
+
     
     function getThis(o) {
         fn.konsole('getting', o.localpathname, '...');
