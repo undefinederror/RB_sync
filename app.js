@@ -3,13 +3,13 @@ var conf = {
     appConf: require('./appConf.js'), 
     taskConf: require('./taskConf.js')
 };
-var CONST=require('./this_modules/const.js')
+var CONST=require('./lib/const.js')
 
 // modules
 var q = require('q');
-var _ftp = require('./this_modules/ftp.js');
-var _xml = require('./this_modules/xml.js');
-var fn = require('./this_modules/fn.js');
+var _ftp = require('./lib/ftp.js');
+var _xml = require('./lib/xml.js');
+var fn = require('./lib/fn.js');
 
 init();
 

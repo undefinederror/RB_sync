@@ -1,4 +1,4 @@
-﻿var CONST = require('./this_modules/const.js');
+﻿var CONST = require('./lib/const.js');
 
 module.exports =
 {
